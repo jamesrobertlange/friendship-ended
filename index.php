@@ -14,7 +14,7 @@
     <div class="container">
       <div class="page-header">
         <h1>Friendship Ended Generator</h1>
-        <p class="lead">Dedicated to the <a href="http://internet.gawker.com/facebook-user-asif-ends-friendship-with-mudasir-welc-1731160013" target="_blank">new friendship of ASIF and SALMAN</a>.</p>
+        <p class="lead">Dedicated to the <a href="https://knowyourmeme.com/memes/friendship-ended-with-mudasir" target="_blank">new friendship of ASIF and SALMAN</a>.</p>
       </div>
       <p><em>(All fields are required. Just like in <strong>friendship</strong>...)</em></p>
       <div class="row">
