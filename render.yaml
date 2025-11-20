@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: friendship-ended
+    runtime: docker
+    plan: free  # Change to 'starter' or other plan as needed
+    healthCheckPath: /
+    envVars:
+      - key: PHP_MEMORY_LIMIT
+        value: 256M
+      - key: UPLOAD_MAX_FILESIZE
+        value: 10M

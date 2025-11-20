@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  friendship-ended:
+    build: .
+    container_name: friendship-ended-app
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount the current directory for live development
+      - .:/var/www/html
+      # Persist tmp directory
+      - ./tmp:/var/www/html/tmp
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+    restart: unless-stopped
+
+volumes:
+  tmp:
