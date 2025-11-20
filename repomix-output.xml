@@ -46,6 +46,7 @@ classes/
 .gitignore
 composer.json
 docker-compose.yml
+Dockerfile
 goodbyemyfriend.php
 index.php
 LICENSE
@@ -59,56 +60,6 @@ x2.png
 
 <files>
 This section contains the contents of the repository's files.
-
-<file path="classes/TextImage.php">
-<?php
-
-/**
- * Builds text to be composited into the background images
- */
-class TextImage extends ImagickDraw {
-  public $color = false;
-  public $fontSize = 38;
-  public $fontWeight = 800;
-  public $gradient = false;
-  public $position = [0,0];
-  public $strokeColor = "#006488";
-  public $strokeWidth = 1;
-  public $scaleSize = [1,2];
-  public $text = "";
-
-  function __construct($args = []) {
-
-    // Add the gradient for the one item that needs a gradient
-    if(isset($args['gradient'])) {
-      $gradient = new Imagick();
-      $gradient->newPseudoImage(50, 120, "gradient:{$args['gradient']}");
-      $this->pushPattern('gradient', 0, 0, 50, 120);
-      $this->composite(Imagick::COMPOSITE_OVER, 0, 0, 50, 120, $gradient);
-      $this->popPattern();
-      $this->setFillPatternURL('#gradient');
-    }
-    // Add a fill with the defined color
-    elseif(isset($args['color'])) {
-      $this->setFillColor($args['color']);
-    }
-
-    $fontSize = isset($args['fontSize']) ? $args['fontSize'] : $this->fontSize;
-    $this->setFontSize($fontSize);
-
-    $scale = isset($args['scale']) ? $args['scale'] : $this->scaleSize;
-    $this->scale($scale[0], $scale[1]);
-
-    $this->setFontWeight($this->fontWeight);
-    $this->setStrokeWidth($this->strokeWidth);
-    $this->setStrokeColor($this->strokeColor);
-    $this->setStrokeAntialias(true);
-
-    $this->annotation($args['position'][0], $args['position'][1], $args['text']);
-  }
-
-}
-</file>
 
 <file path=".dockerignore">
 # Git files
@@ -525,6 +476,111 @@ services:
         value: 10M
 </file>
 
+<file path="classes/TextImage.php">
+<?php
+
+/**
+ * Builds text to be composited into the background images
+ */
+class TextImage extends ImagickDraw {
+  public $color = false;
+  public $fontSize = 38;
+  public $fontWeight = 800;
+  public $gradient = false;
+  public $position = [0,0];
+  public $strokeColor = "#006488";
+  public $strokeWidth = 1;
+  public $scaleSize = [1,2];
+  public $text = "";
+
+  function __construct($args = []) {
+
+    // Set default font - DejaVu Sans Bold is installed in the Docker image
+    $this->setFont('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf');
+
+    // Add the gradient for the one item that needs a gradient
+    if(isset($args['gradient'])) {
+      $gradient = new Imagick();
+      $gradient->newPseudoImage(50, 120, "gradient:{$args['gradient']}");
+      $this->pushPattern('gradient', 0, 0, 50, 120);
+      $this->composite(Imagick::COMPOSITE_OVER, 0, 0, 50, 120, $gradient);
+      $this->popPattern();
+      $this->setFillPatternURL('#gradient');
+    }
+    // Add a fill with the defined color
+    elseif(isset($args['color'])) {
+      $this->setFillColor($args['color']);
+    }
+
+    $fontSize = isset($args['fontSize']) ? $args['fontSize'] : $this->fontSize;
+    $this->setFontSize($fontSize);
+
+    $scale = isset($args['scale']) ? $args['scale'] : $this->scaleSize;
+    $this->scale($scale[0], $scale[1]);
+
+    $this->setFontWeight($this->fontWeight);
+    $this->setStrokeWidth($this->strokeWidth);
+    $this->setStrokeColor($this->strokeColor);
+    $this->setStrokeAntialias(true);
+
+    $this->annotation($args['position'][0], $args['position'][1], $args['text']);
+  }
+
+}
+</file>
+
+<file path="Dockerfile">
+# Use official PHP image with Apache
+FROM php:8.2-apache
+
+# Install ImageMagick, fonts, and required dependencies
+RUN apt-get update && apt-get install -y \
+    libmagickwand-dev \
+    imagemagick \
+    fontconfig \
+    fonts-dejavu-core \
+    fonts-liberation \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP imagick extension
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick
+
+# Create fontconfig cache directory with proper permissions
+RUN mkdir -p /var/cache/fontconfig && \
+    chmod -R 777 /var/cache/fontconfig && \
+    fc-cache -f -v
+
+# Set environment variable for fontconfig
+ENV FONTCONFIG_PATH=/etc/fonts
+ENV FONTCONFIG_FILE=/etc/fonts/fonts.conf
+
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
+
+# Create tmp directory for file uploads with proper permissions
+RUN mkdir -p /var/www/html/tmp && \
+    chown -R www-data:www-data /var/www/html/tmp && \
+    chmod -R 755 /var/www/html/tmp
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
+COPY . /var/www/html/
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]
+</file>
+
 <file path="index.php">
 <!doctype html>
 
@@ -593,7 +649,11 @@ services:
 </file>
 
 <file path="README.md">
-# FRIENDSHIP ENDED
+# FRIENDSHIP ENDED DOCKERIZED
+
+## JL Updates - Link and Description
+[Render.com Link](https://friendship-ended.onrender.com)
+[This classic repo](https://github.com/lmaucoin/friendship-ended) is no longer deployed, so I Dockerized it with Claude vibe coding. Please end all friendships wisely.
 
 ## Description
 did you have a friendship end like [Asif and Mudasir did](http://www.buzzfeed.com/ryanhatesthis/friendship-is-all-about-compromise)
