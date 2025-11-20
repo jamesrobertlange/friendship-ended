@@ -16,6 +16,9 @@ class TextImage extends ImagickDraw {
 
   function __construct($args = []) {
 
+    // Set default font - DejaVu Sans Bold is installed in the Docker image
+    $this->setFont('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf');
+
     // Add the gradient for the one item that needs a gradient
     if(isset($args['gradient'])) {
       $gradient = new Imagick();
