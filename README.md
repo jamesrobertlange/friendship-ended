@@ -2,6 +2,7 @@
 
 ## JL Updates - Link and Description
 [Render.com Link](https://friendship-ended.onrender.com)
+
 [This classic repo](https://github.com/lmaucoin/friendship-ended) is no longer deployed, so I Dockerized it with Claude vibe coding. Please end all friendships wisely.
 
 ## Description
