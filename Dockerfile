@@ -1,5 +1,5 @@
 # Use official PHP image with Apache
-FROM php:8.2-apache
+FROM php:8.2.35-apache
 
 # Install ImageMagick, fonts, and required dependencies
 RUN apt-get update && apt-get install -y \
